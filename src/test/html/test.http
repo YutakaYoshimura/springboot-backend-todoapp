@@ -1,0 +1,98 @@
+##################
+##### 正常系 #####
+##################
+
+### IDを指定して取得
+GET http://localhost:8080/api/v1/todos/100 HTTP/1.1
+
+### 全件取得
+POST http://localhost:8080/api/v1/todos/all HTTP/1.1
+Content-Type: application/json 
+
+{
+    "category": "1",
+}
+
+### 日付範囲を指定して取得
+GET http://localhost:8080/api/v1/todos/date/from/20221110/to/20221231 HTTP/1.1
+
+### 最後に入力したデータを取得
+GET http://localhost:8080/api/v1/todos/maxid HTTP/1.1
+
+### 追加
+POST http://localhost:8080/api/v1/todos HTTP/1.1
+Content-Type: application/json 
+
+{
+    "title": "テストタイトル3",
+    "date": "2022-12-07T00:00:00.000Z",
+    "category": "3",
+    "memo": "テストメモ3"
+}
+
+### IDを指定して更新
+PUT http://localhost:8080/api/v1/todos/2 HTTP/1.1
+Content-Type: application/json
+
+{
+    "title": "テストタイトル２（更新）",
+    "date": "2022-12-06T00:00:00.000Z",
+    "category": "2",
+    "memo": "テストメモ２"
+}
+
+### IDを指定して削除
+DELETE http://localhost:8080/api/v1/todos/3 HTTP/1.1
+
+##################
+##### 異常系 #####
+##################
+
+### IDを指定して取得
+### 指定したデータが存在しない場合
+GET http://localhost:8080/api/v1/todos/1 HTTP/1.1
+
+### 指定したデータが存在しない場合
+GET http://localhost:8080/api/v1/todos/a HTTP/1.1
+
+### 全件取得
+### 1件も登録が無い場合
+GET http://localhost:8080/api/v1/todos/ HTTP/1.1
+
+### 日付範囲を指定して取得
+### 指定した日付範囲内で1件も登録が無い場合
+GET http://localhost:8080/api/v1/todos/date/from/20221110/to/20221111 HTTP/1.1
+
+### 最後に入力したデータを取得
+### 1件も登録が無い場合
+GET http://localhost:8080/api/v1/todos/maxid HTTP/1.1
+
+### 追加
+### ????
+POST http://localhost:8080/api/v1/todos HTTP/1.1
+Content-Type: application/json 
+
+{
+    "date": "2022-11-12T16:39:00.000Z",
+    "todo": "39.5"
+}
+
+### IDを指定して更新
+### 指定したデータが存在しない場合
+PUT http://localhost:8080/api/v1/todos/3 HTTP/1.1
+Content-Type: application/json
+
+{
+    "date": "2022-11-10T16:39:00.000Z",
+    "todo": "39.6"
+}
+
+### IDを指定して削除
+### 指定したデータが存在しない場合
+DELETE http://localhost:8080/api/v1/todos/1 HTTP/1.1
+
+### 想定しないURLでAPIが呼ばれた時(コントローラ内)
+GET http://localhost:8080/api/v1/todos/1/asdfe HTTP/1.1
+
+### 想定しないURLでAPIが呼ばれた時(コントローラ外)
+GET http://localhost:8080/api/v1/tempera/1 HTTP/1.1
