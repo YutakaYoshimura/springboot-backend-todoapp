@@ -32,7 +32,7 @@ public class TodoController {
         Todo todo = todoService.getTodo(id);
         if (todo == null) {
             ErrorMessage res = new ErrorMessage();
-            res.setErrorMessage("該当データが存在しません。");
+            res.setErrorMessage("該当データが存在しませんa。");
             return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(todo, HttpStatus.OK);
