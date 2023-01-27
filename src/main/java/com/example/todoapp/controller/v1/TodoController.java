@@ -2,7 +2,10 @@ package com.example.todoapp.controller.v1;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.todoapp.exception.ErrorMessage;
 import com.example.todoapp.entity.TodoRequest;
 import com.example.todoapp.model.Todo;
 import com.example.todoapp.service.TodoService;
@@ -24,6 +26,7 @@ import com.example.todoapp.service.TodoService;
 @RestController
 @RequestMapping("/api/v1/todos")
 public class TodoController {
+    private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
     @Autowired
     private TodoService todoService;
 
@@ -31,21 +34,18 @@ public class TodoController {
     public ResponseEntity<Object> get(@PathVariable("id") Long id) {
         Todo todo = todoService.getTodo(id);
         if (todo == null) {
-            ErrorMessage res = new ErrorMessage();
-            res.setErrorMessage("該当データが存在しません。");
-            return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(todo, HttpStatus.OK);
     }
     
-    @PostMapping("/all")
-    public ResponseEntity<Object> getAll(@RequestBody int category) {
-        List<Todo> todoList;
-        todoList = category == 0 ? todoService.getAllTodo() : todoService.getTodoByCategory(category);
+    @GetMapping("")
+    public ResponseEntity<Object> getAll() {
+        // List<Todo> todoList;
+        // todoList = category == 0 ? todoService.getAllTodo() : todoService.getTodoByCategory(category);
+        List<Todo> todoList = todoService.getAllTodo();
         if (todoList.size() == 0) {
-            ErrorMessage res = new ErrorMessage();
-            res.setErrorMessage("該当データが存在しません。");
-            return new ResponseEntity<>(res, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(todoList, HttpStatus.OK);
     }
@@ -76,23 +76,23 @@ public class TodoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> update(@PathVariable("id") Long id, @RequestBody TodoRequest todoRequest) {
-        Todo todo = todoService.getTodo(id);
-        if (todo == null) {
-            ErrorMessage res = new ErrorMessage();
-            res.setErrorMessage("該当データが存在しません。");
-            return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
+        try {
+            Todo todo = todoService.updateTodo(id, todoRequest);
+            return new ResponseEntity<>(todo, HttpStatus.OK);
+        } catch (NotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        todo =  todoService.updateTodo(id, todoRequest);
-        return new ResponseEntity<>(todo, HttpStatus.OK);
     }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> delete(@PathVariable("id") Long id) {
         Todo todo = todoService.getTodo(id);
         if (todo == null) {
-            ErrorMessage res = new ErrorMessage();
-            res.setErrorMessage("該当データが存在しません。");
-            return new ResponseEntity<>(res, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         todo =  todoService.deleteTodo(id);
         return new ResponseEntity<>(todo, HttpStatus.OK);

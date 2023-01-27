@@ -18,7 +18,7 @@ public interface TodoService {
 
     public Todo createTodo(TodoRequest TodoRequest);
 
-    public Todo updateTodo(Long id, TodoRequest TodoRequest);
+    public Todo updateTodo(Long id, TodoRequest TodoRequest) throws Exception;
 
     public Todo deleteTodo(Long id);
 }

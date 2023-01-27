@@ -1,8 +1,10 @@
 package com.example.todoapp.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.todoapp.entity.TodoRequest;
@@ -59,16 +61,16 @@ public class TodoServiceImpl implements TodoService{
 
     @Transactional
     @Override
-    public Todo updateTodo(Long id, TodoRequest todoRequest) {
-        todoRepository.findById(id).orElse(new Todo());
-        Todo todo = new Todo(
-                id,
-                todoRequest.getTitle(),
-                todoRequest.getDate(),
-                todoRequest.getCategory(),
-                todoRequest.getMemo(),
-                false
-        );
+    public Todo updateTodo(Long id, TodoRequest todoRequest) throws Exception {
+        Optional<Todo> todoData = this.todoRepository.findById(id);
+        if (!todoData.isPresent()) {
+            throw new NotFoundException();
+        }
+        Todo todo = todoData.get();
+        todo.setTitle(todoRequest.getTitle());
+        todo.setDate(todoRequest.getDate());
+        todo.setCategory(todoRequest.getCategory());
+        todo.setMemo(todoRequest.getMemo());
         return todoRepository.save(todo);
     }
 
